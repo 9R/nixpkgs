@@ -1,52 +1,48 @@
 {
-  stdenvNoCC,
   lib,
   fetchFromGitHub,
-  writeShellApplication,
+  resholve,
   coreutils,
   findutils,
   gawk,
   iconv,
   wget,
+  runtimeShell,
 }:
 
-let
-  podget = stdenvNoCC.mkDerivation (finalAttrs: {
-    pname = "podget";
-    version = "1.0.0";
+resholve.mkDerivation {
+  pname = "podget";
+  version = "1.0.0";
 
-    src = fetchFromGitHub {
-      owner = "dvehrs";
-      repo = "podget";
-      tag = "V${finalAttrs.version}";
-      hash = "sha256-0I42UPWTdSzfRJodB1v3BNI5vwt8GRGpHR7eACoR9YQ=";
-    };
+  src = fetchFromGitHub {
+    owner = "dvehrs";
+    repo = "podget";
+    rev = "18892c6e3d8654fc3332256a564b6dc800e6506c";
+    hash = "sha256-0I42UPWTdSzfRJodB1v3BNI5vwt8GRGpHR7eACoR9YQ=";
+  };
 
-    dontConfigure = true;
-    dontBuild = true;
+  dontConfigure = true;
+  dontBuild = true;
 
-    installPhase = ''
-      runHook preInstall
+  installPhase = ''
+    runHook preInstall
 
-      install -m755 -D podget $out/bin/podget
+    install -m755 -D podget $out/bin/podget
 
-      runHook postInstall
-    '';
-  });
-in
-writeShellApplication {
-  name = "podget";
-  runtimeInputs = [
-    podget
-    coreutils
-    findutils
-    gawk
-    iconv
-    wget
-  ];
-  text = ''
-    podget "$@"
+    runHook postInstall
   '';
+
+  solutions.default = {
+    scripts = [ "bin/podget" ];
+    interpreter = runtimeShell;
+    inputs = [
+      coreutils
+      findutils
+      gawk
+      iconv
+      wget
+    ];
+  };
 
   meta = with lib; {
     description = "Podcast aggregator optimized for running as a scheduled job (i.e. cron) on Linux";
