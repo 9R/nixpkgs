@@ -74,6 +74,11 @@ buildPythonApplication rec {
       git
       lockfile
       marshmallow
+      python3Packages.pip
+      python3Packages.pyyaml
+      python3Packages.rich-click
+      python3Packages.typing-extensions
+      python3Packages.wheel
       pyelftools
       pyserial
       requests
