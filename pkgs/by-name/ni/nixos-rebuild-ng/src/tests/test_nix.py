@@ -263,6 +263,8 @@ def test_copy_closure(monkeypatch: MonkeyPatch) -> None:
         mock_run.assert_called_with(
             [
                 "nix",
+                "--extra-experimental-features",
+                "nix-command flakes",
                 "copy",
                 "--copy-flag",
                 "--from",
@@ -674,6 +676,8 @@ def test_rollback_temporary_profile(tmp_path: Path) -> None:
 def test_set_profile(mock_run: Mock) -> None:
     profile_path = Path("/path/to/profile")
     config_path = Path("/path/to/config")
+    mock_run.return_value = CompletedProcess([], 0)
+
     n.set_profile(
         m.Profile("system", profile_path),
         config_path,
@@ -685,6 +689,19 @@ def test_set_profile(mock_run: Mock) -> None:
         ["nix-env", "-p", profile_path, "--set", config_path],
         remote=None,
         sudo=False,
+    )
+
+    mock_run.return_value = CompletedProcess([], 1)
+
+    with pytest.raises(m.NixOSRebuildError) as e:
+        n.set_profile(
+            m.Profile("system", profile_path),
+            config_path,
+            target_host=None,
+            sudo=False,
+        )
+    assert str(e.value).startswith(
+        "error: your NixOS configuration path seems to be missing essential files."
     )
 
 
