@@ -40,6 +40,7 @@ let
     ifcopenshell
     matplotlib
     opencamlib
+    opencv4
     pivy
     ply # for openSCAD file support
     py-slvs
